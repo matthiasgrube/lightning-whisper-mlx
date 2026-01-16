@@ -35,12 +35,32 @@ Quantization
 [None, "4bit", "8bit"]
 ```
 
+Local Models
+
+```
+./model
+```
+
 #### Example
 
 ```python
 from lightning_whisper_mlx import LightningWhisperMLX
 
 whisper = LightningWhisperMLX(model="distil-medium.en", batch_size=12, quant=None)
+
+text = whisper.transcribe(audio_path="/audio.mp3")['text']
+
+print(text)
+```
+
+#### Example Local Model
+
+Place your config.json and weights.safetensors in a folder called `model` in the same directory as your script.
+
+```python
+from lightning_whisper_mlx import LightningWhisperMLX
+
+whisper = LightningWhisperMLX(model="./model", batch_size=12, quant=None)
 
 text = whisper.transcribe(audio_path="/audio.mp3")['text']
 

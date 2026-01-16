@@ -131,9 +131,11 @@ def find_alignment(
         ]
     )
 
-    logits, cross_qk = model.forward_with_cross_qk(mel[None, :], tokens[None, :])
+    logits, cross_qk = model.forward_with_cross_qk(
+        mel[None, :], tokens[None, :])
     # consider only the logits associated with predicting text
-    sampled_logits = logits[0][len(tokenizer.sot_sequence) : -2, : tokenizer.eot]
+    sampled_logits = logits[0][len(
+        tokenizer.sot_sequence): -2, : tokenizer.eot]
     token_probs = mx.softmax(sampled_logits.astype(mx.float32), axis=-1).astype(
         sampled_logits.dtype
     )
@@ -154,10 +156,11 @@ def find_alignment(
     weights = median_filter(np.array(weights), medfilt_width)
 
     matrix = weights.mean(axis=0)
-    matrix = matrix[len(tokenizer.sot_sequence) : -1]
+    matrix = matrix[len(tokenizer.sot_sequence): -1]
     text_indices, time_indices = dtw(-matrix)
 
-    words, word_tokens = tokenizer.split_to_word_tokens(text_tokens + [tokenizer.eot])
+    words, word_tokens = tokenizer.split_to_word_tokens(
+        text_tokens + [tokenizer.eot])
     if len(word_tokens) <= 1:
         # return on eot only
         # >>> np.pad([], (1, 0))
@@ -165,9 +168,11 @@ def find_alignment(
         # This results in crashes when we lookup jump_times with float, like
         # IndexError: arrays used as indices must be of integer (or boolean) type
         return []
-    word_boundaries = np.pad(np.cumsum([len(t) for t in word_tokens[:-1]]), (1, 0))
+    word_boundaries = np.pad(
+        np.cumsum([len(t) for t in word_tokens[:-1]]), (1, 0))
 
-    jumps = np.pad(np.diff(text_indices), (1, 0), constant_values=1).astype(bool)
+    jumps = np.pad(np.diff(text_indices), (1, 0),
+                   constant_values=1).astype(bool)
     jump_times = time_indices[jumps] / TOKENS_PER_SECOND
     start_times = jump_times[word_boundaries[:-1]]
     end_times = jump_times[word_boundaries[1:]]
@@ -177,7 +182,7 @@ def find_alignment(
     ]
 
     return [
-        WordTiming(word, tokens, start, end, probability)
+        WordTiming(word, tokens, float(start), float(end), float(probability))
         for word, tokens, start, end, probability in zip(
             words, word_tokens, start_times, end_times, word_probabilities
         )
@@ -239,10 +244,12 @@ def add_word_timestamps(
     ]
 
     text_tokens = list(itertools.chain.from_iterable(text_tokens_per_segment))
-    alignment = find_alignment(model, tokenizer, text_tokens, mel, num_frames, **kwargs)
+    alignment = find_alignment(
+        model, tokenizer, text_tokens, mel, num_frames, **kwargs)
     word_durations = np.array([t.end - t.start for t in alignment])
     word_durations = word_durations[word_durations.nonzero()]
-    median_duration = np.median(word_durations) if len(word_durations) > 0 else 0.0
+    median_duration = np.median(word_durations) if len(
+        word_durations) > 0 else 0.0
     median_duration = min(0.7, float(median_duration))
     max_duration = median_duration * 2
 
@@ -276,7 +283,7 @@ def add_word_timestamps(
                         word=timing.word,
                         start=round(time_offset + timing.start, 2),
                         end=round(time_offset + timing.end, 2),
-                        probability=timing.probability,
+                        probability=float(timing.probability),
                     )
                 )
 
@@ -299,7 +306,8 @@ def add_word_timestamps(
                     len(words) > 1
                     and words[1]["end"] - words[1]["start"] > max_duration
                 ):
-                    boundary = max(words[1]["end"] / 2, words[1]["end"] - max_duration)
+                    boundary = max(words[1]["end"] / 2,
+                                   words[1]["end"] - max_duration)
                     words[0]["end"] = words[1]["start"] = boundary
                 words[0]["start"] = max(0, words[0]["end"] - max_duration)
 

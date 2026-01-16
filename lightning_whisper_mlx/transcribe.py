@@ -268,14 +268,14 @@ def transcribe_audio(
         text_tokens = [token for token in tokens if token < tokenizer.eot]
         return {
             "seek": seek,
-            "start": start,
-            "end": end,
+            "start": float(start),
+            "end": float(end),
             "text": tokenizer.decode(text_tokens),
             "tokens": tokens,
-            "temperature": res.temperature,
-            "avg_logprob": res.avg_logprob,
-            "compression_ratio": res.compression_ratio,
-            "no_speech_prob": res.no_speech_prob,
+            "temperature": float(res.temperature),
+            "avg_logprob": float(res.avg_logprob),
+            "compression_ratio": float(res.compression_ratio),
+            "no_speech_prob": float(res.no_speech_prob),
         }
 
     def format_output(tokens, res, mel_segment):

@@ -26,7 +26,18 @@ def load_model(
 
     model_args = whisper.ModelDimensions(**config)
 
-    weights = mx.load(str(model_path / "weights.npz"))
+    # Check for weight file formats - npz or safetensors
+    npz_weights_path = model_path / "weights.npz"
+    safetensors_weights_path = model_path / "weights.safetensors"
+
+    if safetensors_weights_path.exists():
+        weights_path = safetensors_weights_path
+    elif npz_weights_path.exists():
+        weights_path = npz_weights_path
+    else:
+        raise ValueError("No weight file found")
+
+    weights = mx.load(str(weights_path))
     weights = tree_unflatten(list(weights.items()))
 
     model = whisper.Whisper(model_args, dtype)

@@ -1,0 +1,48 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "lightning-whisper-mlx"
+version = "0.0.10"
+description = "Lightning-fast Whisper transcription using MLX"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+authors = [
+    { name = "Matthias Grube" }
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+
+dependencies = [
+    "huggingface_hub",
+    "mlx",
+    "numba",
+    "numpy",
+    "torch",
+    "tqdm",
+    "more-itertools",
+    "tiktoken>=0.7.0,<1.0.0",
+    "scipy",
+]
+
+[project.urls]
+Homepage = "https://github.com/matthiasgrube/lightning-whisper-mlx"
+Repository = "https://github.com/matthiasgrube/lightning-whisper-mlx"
+Issues = "https://github.com/matthiasgrube/lightning-whisper-mlx/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["lightning_whisper_mlx"]
+include = [
+    "lightning_whisper_mlx/**/*.py",
+    "lightning_whisper_mlx/assets/*",
+]
